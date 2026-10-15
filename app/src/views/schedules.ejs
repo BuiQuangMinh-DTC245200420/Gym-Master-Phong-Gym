@@ -1,0 +1,192 @@
+<%- include('partials/header') %>
+<%- include('partials/navbar') %>
+
+<main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1">
+  
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+    <div>
+      <h1 class="text-2xl sm:text-3xl font-extrabold text-white flex items-center gap-3">
+        <i class="fa-solid fa-calendar-check text-blue-400"></i> Quản lý Lịch tập với HLV (PT)
+      </h1>
+      <p class="text-slate-400 text-sm mt-1">Lập lịch 1:1, theo dõi buổi tập và tự động ngăn chặn 100% tình trạng trùng lịch</p>
+    </div>
+
+    <button onclick="document.getElementById('bookScheduleModal').classList.remove('hidden')"
+      class="px-4 py-2.5 rounded-xl bg-blue-500 hover:bg-blue-400 text-slate-950 font-bold text-sm flex items-center gap-2 shadow-lg shadow-blue-500/20 transition-all">
+      <i class="fa-solid fa-calendar-plus"></i> Đặt Lịch Tập Mới
+    </button>
+  </div>
+
+  <% if (message) { %>
+    <div class="mb-6 p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-sm flex items-center gap-3">
+      <i class="fa-solid fa-circle-check"></i>
+      <span><%= message %></span>
+    </div>
+  <% } %>
+
+  <% if (error) { %>
+    <div class="mb-6 p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-sm flex items-center gap-3">
+      <i class="fa-solid fa-triangle-exclamation"></i>
+      <span><%= error %></span>
+    </div>
+  <% } %>
+
+  <!-- Bảng danh sách lịch tập -->
+  <div class="rounded-2xl bg-slate-900/80 border border-slate-800 shadow-lg overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="w-full text-left text-sm">
+        <thead class="text-xs text-slate-400 uppercase bg-slate-950/60 border-b border-slate-800">
+          <tr>
+            <th class="py-4 px-4">Ngày tập</th>
+            <th class="py-4 px-4">Khung giờ</th>
+            <th class="py-4 px-4">Hội viên</th>
+            <th class="py-4 px-4">Huấn luyện viên phụ trách</th>
+            <th class="py-4 px-4">Ghi chú</th>
+            <th class="py-4 px-4">Trạng thái</th>
+            <th class="py-4 px-4 text-right">Thao tác</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-800">
+          <% if (schedules.length === 0) { %>
+            <tr>
+              <td colspan="7" class="py-6 text-center text-slate-500">Chưa có lịch tập PT nào được xếp.</td>
+            </tr>
+          <% } %>
+          <% schedules.forEach(s => { %>
+            <tr class="hover:bg-slate-800/40 transition-colors">
+              <td class="py-4 px-4 font-bold text-white font-mono">
+                <%= new Date(s.schedule_date).toLocaleDateString('vi-VN') %>
+              </td>
+              <td class="py-4 px-4 text-xs font-mono text-emerald-400 font-bold">
+                <%= s.start_time %> - <%= s.end_time %>
+              </td>
+              <td class="py-4 px-4">
+                <div class="font-semibold text-white"><%= s.customer_name %></div>
+                <div class="text-xs text-slate-400"><%= s.customer_phone %></div>
+              </td>
+              <td class="py-4 px-4">
+                <div class="font-bold text-amber-400"><%= s.trainer_name %></div>
+                <div class="text-xs text-slate-400"><%= s.specialty %></div>
+              </td>
+              <td class="py-4 px-4 text-xs text-slate-300 max-w-xs truncate">
+                <%= s.notes %>
+              </td>
+              <td class="py-4 px-4">
+                <% if (s.status === 'CONFIRMED') { %>
+                  <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-blue-500/10 text-blue-400 border border-blue-500/20">
+                    Đã xác nhận
+                  </span>
+                <% } else if (s.status === 'COMPLETED') { %>
+                  <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                    Hoàn thành
+                  </span>
+                <% } else if (s.status === 'CANCELLED') { %>
+                  <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-red-500/10 text-red-400 border border-red-500/20">
+                    Đã hủy
+                  </span>
+                <% } else { %>
+                  <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                    Chờ duyệt
+                  </span>
+                <% } %>
+              </td>
+              <td class="py-4 px-4 text-right">
+                <% if (s.status === 'CONFIRMED') { %>
+                  <div class="flex justify-end gap-2">
+                    <form action="/schedules/status/<%= s.id %>" method="POST">
+                      <input type="hidden" name="status" value="COMPLETED">
+                      <button type="submit" class="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500 hover:text-slate-950 transition-all text-xs" title="Đã tập xong">
+                        <i class="fa-solid fa-check"></i>
+                      </button>
+                    </form>
+                    <form action="/schedules/status/<%= s.id %>" method="POST">
+                      <input type="hidden" name="status" value="CANCELLED">
+                      <button type="submit" class="p-1.5 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500 hover:text-white transition-all text-xs" title="Hủy lịch">
+                        <i class="fa-solid fa-xmark"></i>
+                      </button>
+                    </form>
+                  </div>
+                <% } else { %>
+                  <span class="text-xs text-slate-500">--</span>
+                <% } %>
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Modal Đặt Lịch Tập -->
+  <div id="bookScheduleModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
+    <div class="w-full max-w-md bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-2xl">
+      <div class="flex items-center justify-between pb-4 border-b border-slate-800 mb-4">
+        <h3 class="text-lg font-bold text-white flex items-center gap-2">
+          <i class="fa-solid fa-calendar-plus text-blue-400"></i> Đặt Lịch Tập Cùng HLV
+        </h3>
+        <button onclick="document.getElementById('bookScheduleModal').classList.add('hidden')" class="text-slate-400 hover:text-white">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <form action="/schedules/book" method="POST" class="space-y-4">
+        <% if (user.role !== 'CUSTOMER') { %>
+          <div>
+            <label class="block text-xs font-bold uppercase text-slate-300 mb-1">Chọn Hội viên*</label>
+            <select name="customer_id" required class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-white text-sm focus:border-blue-500">
+              <% customers.forEach(c => { %>
+                <option value="<%= c.id %>"><%= c.full_name %> (<%= c.phone %>)</option>
+              <% }) %>
+            </select>
+          </div>
+        <% } %>
+
+        <div>
+          <label class="block text-xs font-bold uppercase text-slate-300 mb-1">Chọn Huấn luyện viên (PT)*</label>
+          <select name="trainer_id" required class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-white text-sm focus:border-blue-500">
+            <% trainers.forEach(t => { %>
+              <option value="<%= t.id %>"><%= t.full_name %> — <%= t.specialty %></option>
+            <% }) %>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold uppercase text-slate-300 mb-1">Ngày tập*</label>
+          <input type="date" name="schedule_date" required
+            class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-white text-sm focus:border-blue-500">
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-bold uppercase text-slate-300 mb-1">Giờ bắt đầu*</label>
+            <input type="time" name="start_time" required value="08:00"
+              class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-white text-sm focus:border-blue-500">
+          </div>
+          <div>
+            <label class="block text-xs font-bold uppercase text-slate-300 mb-1">Giờ kết thúc*</label>
+            <input type="time" name="end_time" required value="09:00"
+              class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-white text-sm focus:border-blue-500">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold uppercase text-slate-300 mb-1">Mục tiêu buổi tập / Ghi chú</label>
+          <input type="text" name="notes" placeholder="Tập ngực & tay sau, thể lực..."
+            class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-white text-sm focus:border-blue-500">
+        </div>
+
+        <div class="flex justify-end gap-3 pt-4 border-t border-slate-800">
+          <button type="button" onclick="document.getElementById('bookScheduleModal').classList.add('hidden')"
+            class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-sm">Hủy</button>
+          <button type="submit"
+            class="px-5 py-2 rounded-xl bg-blue-500 hover:bg-blue-400 text-slate-950 font-bold text-sm">
+            Xác nhận Đặt lịch
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+</main>
+
+<%- include('partials/footer') %>

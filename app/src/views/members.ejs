@@ -1,0 +1,183 @@
+<%- include('partials/header') %>
+<%- include('partials/navbar') %>
+
+<main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1">
+  
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+    <div>
+      <h1 class="text-2xl sm:text-3xl font-extrabold text-white flex items-center gap-3">
+        <i class="fa-solid fa-users text-emerald-400"></i> Quản lý Hội viên
+      </h1>
+      <p class="text-slate-400 text-sm mt-1">Danh sách thành viên đăng ký tập luyện tại phòng Gym</p>
+    </div>
+
+    <!-- Nút mở modal thêm hội viên -->
+    <button onclick="document.getElementById('addMemberModal').classList.remove('hidden')"
+      class="px-4 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-sm flex items-center gap-2 shadow-lg shadow-emerald-500/20 transition-all">
+      <i class="fa-solid fa-user-plus"></i> Đăng ký Hội viên Mới
+    </button>
+  </div>
+
+  <% if (message) { %>
+    <div class="mb-6 p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-sm flex items-center gap-3">
+      <i class="fa-solid fa-circle-check"></i>
+      <span><%= message %></span>
+    </div>
+  <% } %>
+
+  <% if (error) { %>
+    <div class="mb-6 p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-sm flex items-center gap-3">
+      <i class="fa-solid fa-circle-exclamation"></i>
+      <span><%= error %></span>
+    </div>
+  <% } %>
+
+  <!-- Search form -->
+  <div class="mb-6 p-4 rounded-2xl bg-slate-900/80 border border-slate-800">
+    <form action="/members" method="GET" class="flex gap-3">
+      <div class="relative flex-1">
+        <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-500">
+          <i class="fa-solid fa-magnifying-glass"></i>
+        </span>
+        <input type="text" name="search" value="<%= search %>" placeholder="Tìm theo họ tên, số điện thoại hoặc email..."
+          class="w-full pl-10 pr-4 py-2 bg-slate-950 border border-slate-800 rounded-xl text-white text-sm focus:outline-none focus:border-emerald-500">
+      </div>
+      <button type="submit" class="px-5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-semibold text-sm border border-slate-700">
+        Tìm kiếm
+      </button>
+      <% if (search) { %>
+        <a href="/members" class="px-4 py-2 rounded-xl bg-slate-800 text-slate-400 hover:text-white text-sm flex items-center">
+          Xóa lọc
+        </a>
+      <% } %>
+    </form>
+  </div>
+
+  <!-- Member Table -->
+  <div class="rounded-2xl bg-slate-900/80 border border-slate-800 shadow-lg overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="w-full text-left text-sm">
+        <thead class="text-xs text-slate-400 uppercase bg-slate-950/60 border-b border-slate-800">
+          <tr>
+            <th class="py-4 px-4">Mã / Tên Hội viên</th>
+            <th class="py-4 px-4">Liên hệ</th>
+            <th class="py-4 px-4">Gói tập hiện tại</th>
+            <th class="py-4 px-4">Thời hạn gói</th>
+            <th class="py-4 px-4">Số buổi PT</th>
+            <th class="py-4 px-4 text-center">Trạng thái</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-800">
+          <% if (members.length === 0) { %>
+            <tr>
+              <td colspan="6" class="py-6 text-center text-slate-500">Không tìm thấy hội viên nào.</td>
+            </tr>
+          <% } %>
+          <% members.forEach(m => { %>
+            <tr class="hover:bg-slate-800/40 transition-colors">
+              <td class="py-4 px-4">
+                <div class="font-bold text-white"><%= m.full_name %></div>
+                <div class="text-xs text-slate-400 font-mono">ID: GYM-<%= String(m.id).padStart(4, '0') %> (@<%= m.username %>)</div>
+              </td>
+              <td class="py-4 px-4">
+                <div class="text-slate-300"><i class="fa-solid fa-phone text-xs text-slate-500 mr-1"></i><%= m.phone %></div>
+                <div class="text-xs text-slate-400"><%= m.email %></div>
+              </td>
+              <td class="py-4 px-4 font-semibold text-emerald-400">
+                <%= m.package_name || 'Chưa đăng ký gói' %>
+              </td>
+              <td class="py-4 px-4 text-xs font-mono">
+                <% if (m.start_date && m.end_date) { %>
+                  <div class="text-slate-300">Từ: <%= new Date(m.start_date).toLocaleDateString('vi-VN') %></div>
+                  <div class="<%= new Date(m.end_date) >= new Date() ? 'text-emerald-400' : 'text-red-400 font-bold' %>">
+                    Đến: <%= new Date(m.end_date).toLocaleDateString('vi-VN') %>
+                  </div>
+                <% } else { %>
+                  <span class="text-slate-500">--</span>
+                <% } %>
+              </td>
+              <td class="py-4 px-4 font-mono font-bold text-amber-400">
+                <%= m.remaining_pt_sessions || 0 %> buổi
+              </td>
+              <td class="py-4 px-4 text-center">
+                <% if (m.membership_status === 'ACTIVE' && new Date(m.end_date) >= new Date()) { %>
+                  <span class="px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                    Đang hoạt động
+                  </span>
+                <% } else if (m.membership_status) { %>
+                  <span class="px-2.5 py-1 rounded-full text-xs font-bold bg-red-500/10 text-red-400 border border-red-500/20">
+                    Hết hạn
+                  </span>
+                <% } else { %>
+                  <span class="px-2.5 py-1 rounded-full text-xs font-bold bg-slate-800 text-slate-400 border border-slate-700">
+                    Chưa kích hoạt
+                  </span>
+                <% } %>
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Modal Đăng ký Hội viên Mới -->
+  <div id="addMemberModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
+    <div class="w-full max-w-lg bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-2xl">
+      <div class="flex items-center justify-between pb-4 border-b border-slate-800 mb-4">
+        <h3 class="text-lg font-bold text-white flex items-center gap-2">
+          <i class="fa-solid fa-user-plus text-emerald-400"></i> Đăng ký Hội viên Mới
+        </h3>
+        <button onclick="document.getElementById('addMemberModal').classList.add('hidden')" class="text-slate-400 hover:text-white">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <form action="/members/create" method="POST" class="space-y-4">
+        <div>
+          <label class="block text-xs font-bold uppercase text-slate-300 mb-1">Tên đăng nhập (Username)*</label>
+          <input type="text" name="username" required placeholder="vidu: nguyenvana"
+            class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-white text-sm focus:border-emerald-500">
+        </div>
+        <div>
+          <label class="block text-xs font-bold uppercase text-slate-300 mb-1">Họ và Tên đầy đủ*</label>
+          <input type="text" name="full_name" required placeholder="Nguyễn Văn A"
+            class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-white text-sm focus:border-emerald-500">
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-bold uppercase text-slate-300 mb-1">Số điện thoại*</label>
+            <input type="text" name="phone" required placeholder="0901234567"
+              class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-white text-sm focus:border-emerald-500">
+          </div>
+          <div>
+            <label class="block text-xs font-bold uppercase text-slate-300 mb-1">Email*</label>
+            <input type="email" name="email" required placeholder="a@gmail.com"
+              class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-white text-sm focus:border-emerald-500">
+          </div>
+        </div>
+        <div>
+          <label class="block text-xs font-bold uppercase text-slate-300 mb-1">Chọn Gói tập kích hoạt ngay</label>
+          <select name="package_id" class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-white text-sm focus:border-emerald-500">
+            <option value="">-- Chưa mua gói (kích hoạt sau) --</option>
+            <% packages.forEach(p => { %>
+              <option value="<%= p.id %>"><%= p.name %> - <%= Number(p.price).toLocaleString('vi-VN') %> đ (<%= p.duration_days %> ngày)</option>
+            <% }) %>
+          </select>
+        </div>
+
+        <div class="flex justify-end gap-3 pt-4 border-t border-slate-800">
+          <button type="button" onclick="document.getElementById('addMemberModal').classList.add('hidden')"
+            class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-sm">Hủy</button>
+          <button type="submit"
+            class="px-5 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-sm">
+            Tạo Hội Viên
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+</main>
+
+<%- include('partials/footer') %>

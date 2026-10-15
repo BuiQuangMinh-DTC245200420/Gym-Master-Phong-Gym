@@ -1,0 +1,97 @@
+services:
+  # 1. Cơ sở dữ liệu MySQL
+  db:
+    image: mysql:8.0
+    container_name: gym_mysql_db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./database/init.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+    # HARDENING: DB chỉ nằm trong mạng nội bộ gym_backend, không mở port trực tiếp ra Internet
+    networks:
+      - gym_backend
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_ROOT_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  # 2. Ứng dụng Web Quản lý Phòng Gym (Node.js Express)
+  app:
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+    container_name: gym_web_app
+    restart: unless-stopped
+    environment:
+      PORT: ${PORT}
+      NODE_ENV: ${NODE_ENV}
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      SESSION_SECRET: ${SESSION_SECRET}
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - gym_frontend
+      - gym_backend
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "-", "http://127.0.0.1:3000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  # 3. Giao diện quản trị CSDL phpMyAdmin
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    container_name: gym_phpmyadmin
+    restart: unless-stopped
+    environment:
+      PMA_HOST: ${DB_HOST}
+      PMA_PORT: ${DB_PORT}
+      UPLOAD_LIMIT: 64M
+    ports:
+      - "${PMA_PORT}:80"
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - gym_frontend
+      - gym_backend
+
+  # 4. Nginx Reverse Proxy (HTTPS Tự Ký + Security Headers)
+  nginx:
+    image: nginx:alpine
+    container_name: gym_nginx_proxy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - app
+      - phpmyadmin
+    networks:
+      - gym_frontend
+
+# HARDENING: Cô lập phân tầng mạng (Network Isolation)
+networks:
+  gym_frontend:
+    driver: bridge
+  gym_backend:
+    driver: bridge
+
+volumes:
+  mysql_data:

@@ -1,0 +1,77 @@
+<%- include('partials/header') %>
+<%- include('partials/navbar') %>
+
+<main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1">
+  
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+    <div>
+      <h1 class="text-2xl sm:text-3xl font-extrabold text-white flex items-center gap-3">
+        <i class="fa-solid fa-receipt text-purple-400"></i> Quản lý Hóa đơn & Thu chi
+      </h1>
+      <p class="text-slate-400 text-sm mt-1">Lịch sử giao dịch thanh toán gói tập và dịch vụ Gym</p>
+    </div>
+
+    <div class="p-4 rounded-xl bg-purple-500/10 border border-purple-500/20 text-right">
+      <span class="text-xs text-purple-300 font-bold uppercase tracking-wider block">Tổng doanh thu thực tế</span>
+      <span class="text-2xl font-black text-white"><%= Number(totalRevenue).toLocaleString('vi-VN') %> đ</span>
+    </div>
+  </div>
+
+  <div class="rounded-2xl bg-slate-900/80 border border-slate-800 shadow-lg overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="w-full text-left text-sm">
+        <thead class="text-xs text-slate-400 uppercase bg-slate-950/60 border-b border-slate-800">
+          <tr>
+            <th class="py-4 px-4">Mã Hóa đơn</th>
+            <th class="py-4 px-4">Hội viên</th>
+            <th class="py-4 px-4">Gói dịch vụ</th>
+            <th class="py-4 px-4">Hình thức thanh toán</th>
+            <th class="py-4 px-4">Số tiền</th>
+            <th class="py-4 px-4">Thời gian</th>
+            <th class="py-4 px-4 text-center">Trạng thái</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-800">
+          <% if (invoices.length === 0) { %>
+            <tr>
+              <td colspan="7" class="py-6 text-center text-slate-500">Chưa có giao dịch hóa đơn nào.</td>
+            </tr>
+          <% } %>
+          <% invoices.forEach(inv => { %>
+            <tr class="hover:bg-slate-800/40 transition-colors">
+              <td class="py-4 px-4 font-mono font-bold text-slate-200">
+                <%= inv.invoice_code %>
+              </td>
+              <td class="py-4 px-4">
+                <div class="font-semibold text-white"><%= inv.customer_name %></div>
+                <div class="text-xs text-slate-400 font-mono"><%= inv.customer_phone %></div>
+              </td>
+              <td class="py-4 px-4 font-medium text-emerald-400">
+                <%= inv.package_name %>
+              </td>
+              <td class="py-4 px-4 text-xs font-semibold">
+                <span class="px-2.5 py-1 rounded-lg bg-slate-800 text-slate-300 border border-slate-700">
+                  <%= inv.payment_method %>
+                </span>
+              </td>
+              <td class="py-4 px-4 font-bold text-white font-mono">
+                <%= Number(inv.amount).toLocaleString('vi-VN') %> đ
+              </td>
+              <td class="py-4 px-4 text-xs text-slate-400 font-mono">
+                <%= new Date(inv.created_at).toLocaleString('vi-VN') %>
+              </td>
+              <td class="py-4 px-4 text-center">
+                <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                  <%= inv.payment_status %>
+                </span>
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</main>
+
+<%- include('partials/footer') %>

@@ -1,0 +1,251 @@
+<%- include('partials/header') %>
+<%- include('partials/navbar') %>
+
+<main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1">
+  
+  <!-- Welcome banner -->
+  <div class="mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4 p-6 rounded-2xl bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border border-slate-700/60 shadow-xl">
+    <div>
+      <h1 class="text-2xl sm:text-3xl font-extrabold text-white">
+        Xin chào, <span class="text-emerald-400"><%= user.fullName %></span>! 👋
+      </h1>
+      <p class="text-slate-400 text-sm mt-1">
+        Vai trò hiện tại: <span class="font-bold text-white"><%= user.role %></span> — Trung tâm quản trị & vận hành phòng tập Gym & Fitness
+      </p>
+    </div>
+    <div class="flex items-center gap-3">
+      <a href="/attendance" class="px-4 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-sm flex items-center gap-2 shadow-lg shadow-emerald-500/20 transition-all">
+        <i class="fa-solid fa-qrcode"></i> Quầy Điểm danh
+      </a>
+      <a href="/members" class="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-semibold text-sm border border-slate-600 flex items-center gap-2 transition-all">
+        <i class="fa-solid fa-user-plus"></i> Thêm hội viên
+      </a>
+    </div>
+  </div>
+
+  <!-- Stat Cards -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    
+    <!-- Stat 1 -->
+    <div class="p-6 rounded-2xl bg-slate-900/80 border border-slate-800 shadow-lg relative overflow-hidden">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Tổng số Hội viên</p>
+          <h3 class="text-3xl font-black text-white mt-2"><%= stats.totalMembers %></h3>
+          <p class="text-xs text-emerald-400 mt-2 flex items-center gap-1 font-semibold">
+            <i class="fa-solid fa-arrow-up"></i> Đang hoạt động
+          </p>
+        </div>
+        <div class="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 text-xl">
+          <i class="fa-solid fa-users"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stat 2 -->
+    <div class="p-6 rounded-2xl bg-slate-900/80 border border-slate-800 shadow-lg relative overflow-hidden">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Gói tập còn hạn</p>
+          <h3 class="text-3xl font-black text-white mt-2"><%= stats.activeMemberships %></h3>
+          <p class="text-xs text-blue-400 mt-2 flex items-center gap-1 font-semibold">
+            <i class="fa-solid fa-id-card"></i> Thẻ hiệu lực
+          </p>
+        </div>
+        <div class="w-12 h-12 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 text-xl">
+          <i class="fa-solid fa-cubes"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stat 3 -->
+    <div class="p-6 rounded-2xl bg-slate-900/80 border border-slate-800 shadow-lg relative overflow-hidden">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Check-in hôm nay</p>
+          <h3 class="text-3xl font-black text-white mt-2"><%= stats.todayCheckins %></h3>
+          <p class="text-xs text-amber-400 mt-2 flex items-center gap-1 font-semibold">
+            <i class="fa-solid fa-clock-rotate-left"></i> Lượt tập trong ngày
+          </p>
+        </div>
+        <div class="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 text-xl">
+          <i class="fa-solid fa-dumbbell"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stat 4 -->
+    <div class="p-6 rounded-2xl bg-slate-900/80 border border-slate-800 shadow-lg relative overflow-hidden">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Doanh thu thu về</p>
+          <h3 class="text-2xl font-black text-white mt-2">
+            <%= Number(stats.totalRevenue).toLocaleString('vi-VN') %> <span class="text-xs text-slate-400 font-normal">VNĐ</span>
+          </h3>
+          <p class="text-xs text-purple-400 mt-2 flex items-center gap-1 font-semibold">
+            <i class="fa-solid fa-circle-check"></i> Đã thanh toán
+          </p>
+        </div>
+        <div class="w-12 h-12 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400 text-xl">
+          <i class="fa-solid fa-sack-dollar"></i>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Tables Section -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+    
+    <!-- Recent Attendance -->
+    <div class="p-6 rounded-2xl bg-slate-900/80 border border-slate-800 shadow-lg">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-lg font-bold text-white flex items-center gap-2">
+          <i class="fa-solid fa-id-badge text-emerald-400"></i> Lượt Điểm danh Gần nhất
+        </h2>
+        <a href="/attendance" class="text-xs text-emerald-400 hover:underline font-semibold">Xem tất cả</a>
+      </div>
+      
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-sm">
+          <thead class="text-xs text-slate-400 uppercase border-b border-slate-800">
+            <tr>
+              <th class="py-3 px-2">Hội viên</th>
+              <th class="py-3 px-2">Gói tập</th>
+              <th class="py-3 px-2">Thời gian</th>
+              <th class="py-3 px-2 text-right">Trạng thái</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-800/60">
+            <% if (recentAttendance.length === 0) { %>
+              <tr>
+                <td colspan="4" class="py-4 text-center text-slate-500">Chưa có lượt điểm danh nào</td>
+              </tr>
+            <% } %>
+            <% recentAttendance.forEach(a => { %>
+              <tr>
+                <td class="py-3 px-2 font-semibold text-white">
+                  <%= a.full_name %>
+                  <div class="text-xs text-slate-400"><%= a.phone %></div>
+                </td>
+                <td class="py-3 px-2 text-slate-300"><%= a.package_name || 'Chưa đăng ký' %></td>
+                <td class="py-3 px-2 text-xs text-slate-400 font-mono">
+                  <%= new Date(a.check_in_time).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) %>
+                </td>
+                <td class="py-3 px-2 text-right">
+                  <% if (a.status === 'VALID') { %>
+                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                      Hợp lệ
+                    </span>
+                  <% } else { %>
+                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-red-500/10 text-red-400 border border-red-500/20">
+                      Từ chối
+                    </span>
+                  <% } %>
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Upcoming Schedules -->
+    <div class="p-6 rounded-2xl bg-slate-900/80 border border-slate-800 shadow-lg">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-lg font-bold text-white flex items-center gap-2">
+          <i class="fa-solid fa-calendar-day text-blue-400"></i> Lịch tập cùng HLV (PT)
+        </h2>
+        <a href="/schedules" class="text-xs text-blue-400 hover:underline font-semibold">Xem tất cả</a>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-sm">
+          <thead class="text-xs text-slate-400 uppercase border-b border-slate-800">
+            <tr>
+              <th class="py-3 px-2">Hội viên</th>
+              <th class="py-3 px-2">HLV cá nhân</th>
+              <th class="py-3 px-2">Lịch tập</th>
+              <th class="py-3 px-2 text-right">Trạng thái</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-800/60">
+            <% if (upcomingSchedules.length === 0) { %>
+              <tr>
+                <td colspan="4" class="py-4 text-center text-slate-500">Chưa có lịch hẹn PT nào sắp tới</td>
+              </tr>
+            <% } %>
+            <% upcomingSchedules.forEach(s => { %>
+              <tr>
+                <td class="py-3 px-2 font-semibold text-white">
+                  <%= s.customer_name %>
+                </td>
+                <td class="py-3 px-2 text-slate-300">
+                  <span class="text-amber-400 font-medium"><%= s.trainer_name %></span>
+                </td>
+                <td class="py-3 px-2 text-xs text-slate-400 font-mono">
+                  <%= new Date(s.schedule_date).toLocaleDateString('vi-VN') %><br>
+                  <%= s.start_time %> - <%= s.end_time %>
+                </td>
+                <td class="py-3 px-2 text-right">
+                  <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-blue-500/10 text-blue-400 border border-blue-500/20">
+                    <%= s.status %>
+                  </span>
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- DevOps Infrastructure Status Box (Minh chứng môn Triển khai & Quản trị HTPM) -->
+  <div class="mt-8 p-6 rounded-2xl bg-slate-950/90 border border-slate-800">
+    <div class="flex items-center justify-between mb-4">
+      <h3 class="text-sm font-bold uppercase tracking-wider text-slate-400 flex items-center gap-2">
+        <i class="fa-solid fa-server text-emerald-400"></i> Trạng thái Kiến trúc Hạ tầng (DevOps Architecture)
+      </h3>
+      <span class="text-xs px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-bold">
+        Docker Compose Stack
+      </span>
+    </div>
+    
+    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3 text-xs">
+      <div class="p-3 rounded-xl bg-slate-900 border border-slate-800">
+        <div class="text-slate-400">Web App</div>
+        <div class="font-bold text-white mt-1">Node.js Express</div>
+        <div class="text-emerald-400 font-semibold mt-1">● Port 3000</div>
+      </div>
+      <div class="p-3 rounded-xl bg-slate-900 border border-slate-800">
+        <div class="text-slate-400">Database</div>
+        <div class="font-bold text-white mt-1">MySQL 8.0</div>
+        <div class="text-emerald-400 font-semibold mt-1">● gym_db</div>
+      </div>
+      <div class="p-3 rounded-xl bg-slate-900 border border-slate-800">
+        <div class="text-slate-400">DB Management</div>
+        <div class="font-bold text-white mt-1">phpMyAdmin</div>
+        <div class="text-emerald-400 font-semibold mt-1">● Port 8080</div>
+      </div>
+      <div class="p-3 rounded-xl bg-slate-900 border border-slate-800">
+        <div class="text-slate-400">Reverse Proxy</div>
+        <div class="font-bold text-white mt-1">Nginx (SSL)</div>
+        <div class="text-emerald-400 font-semibold mt-1">● HTTPS :443</div>
+      </div>
+      <div class="p-3 rounded-xl bg-slate-900 border border-slate-800">
+        <div class="text-slate-400">Monitoring</div>
+        <div class="font-bold text-white mt-1">Prometheus + Grafana</div>
+        <div class="text-blue-400 font-semibold mt-1">● :9090 / :3001</div>
+      </div>
+      <div class="p-3 rounded-xl bg-slate-900 border border-slate-800">
+        <div class="text-slate-400">Logging</div>
+        <div class="font-bold text-white mt-1">Loki + Promtail</div>
+        <div class="text-amber-400 font-semibold mt-1">● LogQL Ready</div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<%- include('partials/footer') %>

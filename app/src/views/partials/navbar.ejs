@@ -1,0 +1,63 @@
+<nav class="glass-nav border-b border-slate-800 sticky top-0 z-50">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex items-center justify-between h-16">
+      
+      <!-- Logo -->
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-500 to-teal-400 flex items-center justify-center shadow-lg shadow-emerald-500/20">
+          <i class="fa-solid fa-dumbbell text-slate-950 text-xl font-bold"></i>
+        </div>
+        <a href="/dashboard" class="text-xl font-extrabold tracking-tight text-white hover:text-emerald-400 transition-colors">
+          GYM<span class="text-emerald-400">MASTER</span>
+        </a>
+      </div>
+
+      <!-- Navigation Links -->
+      <div class="hidden md:flex items-center space-x-1">
+        <a href="/dashboard" class="px-3 py-2 rounded-lg text-sm font-semibold transition-all <%= currentPath === '/dashboard' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30' : 'text-slate-300 hover:bg-slate-800 hover:text-white' %>">
+          <i class="fa-solid fa-chart-pie mr-1.5"></i> Dashboard
+        </a>
+        <a href="/members" class="px-3 py-2 rounded-lg text-sm font-semibold transition-all <%= currentPath.startsWith('/members') ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30' : 'text-slate-300 hover:bg-slate-800 hover:text-white' %>">
+          <i class="fa-solid fa-users mr-1.5"></i> Hội viên
+        </a>
+        <a href="/packages" class="px-3 py-2 rounded-lg text-sm font-semibold transition-all <%= currentPath.startsWith('/packages') ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30' : 'text-slate-300 hover:bg-slate-800 hover:text-white' %>">
+          <i class="fa-solid fa-tags mr-1.5"></i> Gói tập
+        </a>
+        <a href="/attendance" class="px-3 py-2 rounded-lg text-sm font-semibold transition-all <%= currentPath.startsWith('/attendance') ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30' : 'text-slate-300 hover:bg-slate-800 hover:text-white' %>">
+          <i class="fa-solid fa-id-card-clip mr-1.5"></i> Điểm danh
+        </a>
+        <a href="/schedules" class="px-3 py-2 rounded-lg text-sm font-semibold transition-all <%= currentPath.startsWith('/schedules') ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30' : 'text-slate-300 hover:bg-slate-800 hover:text-white' %>">
+          <i class="fa-solid fa-calendar-check mr-1.5"></i> Lịch PT
+        </a>
+        <a href="/invoices" class="px-3 py-2 rounded-lg text-sm font-semibold transition-all <%= currentPath.startsWith('/invoices') ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30' : 'text-slate-300 hover:bg-slate-800 hover:text-white' %>">
+          <i class="fa-solid fa-receipt mr-1.5"></i> Hóa đơn
+        </a>
+      </div>
+
+      <!-- User Info & Logout -->
+      <div class="flex items-center gap-3">
+        <% if (currentUser) { %>
+          <div class="hidden sm:flex flex-col text-right">
+            <span class="text-sm font-bold text-white"><%= currentUser.fullName %></span>
+            <span class="text-xs px-2 py-0.5 rounded-full inline-block font-mono font-medium self-end
+              <%= currentUser.role === 'ADMIN' ? 'bg-red-500/20 text-red-400 border border-red-500/30' : 
+                 (currentUser.role === 'OWNER' ? 'bg-purple-500/20 text-purple-400 border border-purple-500/30' : 
+                 (currentUser.role === 'RECEPTIONIST' ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30' : 
+                 (currentUser.role === 'TRAINER' ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30' : 
+                 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'))) %>">
+              <%= currentUser.role %>
+            </span>
+          </div>
+          <a href="/logout" class="p-2 rounded-lg bg-slate-800 hover:bg-red-500/20 text-slate-300 hover:text-red-400 border border-slate-700 hover:border-red-500/30 transition-all" title="Đăng xuất">
+            <i class="fa-solid fa-right-from-bracket"></i>
+          </a>
+        <% } else { %>
+          <a href="/login" class="px-4 py-2 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold transition-all">
+            Đăng nhập
+          </a>
+        <% } %>
+      </div>
+
+    </div>
+  </div>
+</nav>

@@ -1,0 +1,75 @@
+<%- include('partials/header') %>
+
+<div class="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-slate-950 via-slate-900 to-emerald-950/40">
+  <div class="w-full max-w-md bg-slate-900/90 border border-slate-800 rounded-2xl shadow-2xl p-8 backdrop-blur-xl">
+    
+    <!-- Header -->
+    <div class="text-center mb-8">
+      <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-400 mb-4 shadow-xl shadow-emerald-500/20">
+        <i class="fa-solid fa-dumbbell text-slate-950 text-2xl font-black"></i>
+      </div>
+      <h1 class="text-2xl font-black tracking-tight text-white">GYM MASTER</h1>
+      <p class="text-slate-400 text-sm mt-1">Đề tài 23 - Hệ thống Quản lý Phòng Gym & Fitness</p>
+    </div>
+
+    <% if (error) { %>
+      <div class="mb-6 p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-sm flex items-center gap-3">
+        <i class="fa-solid fa-circle-exclamation text-base"></i>
+        <span><%= error %></span>
+      </div>
+    <% } %>
+
+    <!-- Form -->
+    <form action="/login" method="POST" class="space-y-5">
+      <div>
+        <label class="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-2">Tên đăng nhập</label>
+        <div class="relative">
+          <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-500">
+            <i class="fa-solid fa-user"></i>
+          </span>
+          <input type="text" name="username" required placeholder="Nhập username (admin, letan, trainer1...)"
+            class="w-full pl-10 pr-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 text-sm transition-all">
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-2">Mật khẩu</label>
+        <div class="relative">
+          <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-500">
+            <i class="fa-solid fa-lock"></i>
+          </span>
+          <input type="password" name="password" required placeholder="Nhập mật khẩu (123456)"
+            class="w-full pl-10 pr-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 text-sm transition-all">
+        </div>
+      </div>
+
+      <button type="submit"
+        class="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-extrabold text-sm shadow-lg shadow-emerald-500/25 transition-all transform hover:-translate-y-0.5">
+        ĐĂNG NHẬP HỆ THỐNG
+      </button>
+    </form>
+
+    <!-- Demo accounts hint -->
+    <div class="mt-8 pt-6 border-t border-slate-800/80">
+      <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 text-center">Tài khoản demo sẵn có (MK: 123456)</p>
+      <div class="grid grid-cols-2 gap-2 text-xs">
+        <div class="p-2 bg-slate-950/60 rounded-lg border border-slate-800">
+          <span class="text-slate-400">Admin:</span> <strong class="text-emerald-400 font-mono">admin</strong>
+        </div>
+        <div class="p-2 bg-slate-950/60 rounded-lg border border-slate-800">
+          <span class="text-slate-400">Chủ Gym:</span> <strong class="text-purple-400 font-mono">owner</strong>
+        </div>
+        <div class="p-2 bg-slate-950/60 rounded-lg border border-slate-800">
+          <span class="text-slate-400">Lễ tân:</span> <strong class="text-blue-400 font-mono">letan</strong>
+        </div>
+        <div class="p-2 bg-slate-950/60 rounded-lg border border-slate-800">
+          <span class="text-slate-400">HLV (PT):</span> <strong class="text-amber-400 font-mono">trainer1</strong>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+</body>
+</html>
