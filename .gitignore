@@ -22,3 +22,10 @@ loki_data/
 # OS files
 .DS_Store
 Thumbs.db
+
+# SSL private key
+nginx/ssl/nginx.key
+
+# Local environment files
+.env.*
+!.env.example
