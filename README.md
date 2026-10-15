@@ -153,3 +153,16 @@ count_over_time({container="gym_web_app"} |= "ERROR" [1m])
 - **Commit 1**: Triển khai ứng dụng Gym Web App, MySQL Database, phpMyAdmin và cấu hình Nginx Reverse Proxy (HTTPS + Security Headers).
 - **Commit 2**: Tích hợp hệ thống giám sát Prometheus và Grafana Dashboard giám sát container, web server và database (cAdvisor, mysqld_exporter, nginx_exporter).
 - **Commit 3**: Tích hợp hệ thống log tập trung Loki + Promtail, truy vấn log LogQL và áp dụng các giải pháp Hardening bảo mật (3 mạng Network Isolation, .gitignore bảo mật).
+- **Commit 4**: Bổ sung tài liệu kết quả kiểm thử Loki + Promtail và các truy vấn LogQL.
+## 📝 9. Kết quả kiểm thử Loki + Promtail + LogQL
+
+Đã kiểm thử trên môi trường Docker Compose:
+
+- **Thu thập log:** Promtail phát hiện các Docker container được cấu hình và gửi log đến Loki.
+- **Truy vấn log ứng dụng:** `{container="gym_web_app"}` — trả về log của Web App.
+- **Lọc log đăng nhập:** `{container="gym_web_app"} |= "login"` — trả về các dòng log có chứa chuỗi `login`.
+- **Lọc log mã lỗi HTTP 500:** `{container="gym_web_app"} |= "500"` — dùng để tìm các dòng log chứa chuỗi `500`; kết quả phụ thuộc vào log phát sinh tại thời điểm truy vấn.
+- **Truy vấn log Nginx:** `{container="gym_nginx_proxy"}` — dùng để xem log của Nginx Reverse Proxy.
+- **Thống kê log lỗi:** `count_over_time({container="gym_web_app"} |= "ERROR" [1m])` — đếm số dòng log chứa `ERROR` trong khoảng thời gian một phút.
+
+Các truy vấn được thực hiện trong Grafana Explore với Loki làm nguồn dữ liệu.
