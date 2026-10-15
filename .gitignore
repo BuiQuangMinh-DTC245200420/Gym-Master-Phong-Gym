@@ -5,6 +5,9 @@ package-lock.json
 # Environment variables
 .env
 
+# HARDENING: Che giấu thông tin đăng nhập MySQL nhạy cảm
+database/.my.cnf
+
 # Logs
 logs/
 *.log

@@ -1,0 +1,47 @@
+global:
+  scrape_interval: 10s
+  evaluation_interval: 10s
+  scrape_timeout: 5s
+
+scrape_configs:
+  # 1. Tự giám sát Prometheus
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # 2. Giám sát ứng dụng Web App Node.js (prom-client)
+  - job_name: 'gym-web-app'
+    metrics_path: '/metrics'
+    scrape_interval: 5s
+    static_configs:
+      - targets: ['app:3000']
+        labels:
+          app: 'gym-management'
+          tier: 'application'
+
+  # 3. Giám sát Cơ sở dữ liệu MySQL (mysqld-exporter)
+  - job_name: 'gym-mysql-db'
+    scrape_interval: 10s
+    static_configs:
+      - targets: ['mysqld_exporter:9104']
+        labels:
+          app: 'gym-mysql'
+          tier: 'database'
+
+  # 4. Giám sát Nginx Reverse Proxy (nginx-prometheus-exporter)
+  - job_name: 'gym-nginx-proxy'
+    scrape_interval: 10s
+    static_configs:
+      - targets: ['nginx_exporter:9113']
+        labels:
+          app: 'gym-nginx'
+          tier: 'webserver'
+
+  # 5. Giám sát Docker Containers (cAdvisor)
+  - job_name: 'gym-cadvisor'
+    scrape_interval: 10s
+    static_configs:
+      - targets: ['cadvisor:8080']
+        labels:
+          app: 'cadvisor'
+          tier: 'infrastructure'

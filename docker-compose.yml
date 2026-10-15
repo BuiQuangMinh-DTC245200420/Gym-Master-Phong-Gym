@@ -44,6 +44,7 @@ services:
     networks:
       - gym_frontend
       - gym_backend
+      - gym_monitoring
     healthcheck:
       test: ["CMD", "wget", "-q", "-O", "-", "http://127.0.0.1:3000/health"]
       interval: 10s
@@ -85,6 +86,123 @@ services:
       - phpmyadmin
     networks:
       - gym_frontend
+      - gym_monitoring
+
+  # 5. MySQL Exporter (Thu thập Metrics từ MySQL cho Prometheus)
+  mysqld_exporter:
+    image: prom/mysqld-exporter:latest
+    container_name: gym_mysqld_exporter
+    restart: unless-stopped
+    command:
+      - --config.my-cnf=/etc/.my.cnf
+    volumes:
+      - ./database/.my.cnf:/etc/.my.cnf:ro
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - gym_backend
+      - gym_monitoring
+
+  # 6. Nginx Exporter (Thu thập Metrics từ Nginx stub_status)
+  nginx_exporter:
+    image: nginx/nginx-prometheus-exporter:latest
+    container_name: gym_nginx_exporter
+    restart: unless-stopped
+    command:
+      - -nginx.scrape-uri=http://nginx:80/stub_status
+    depends_on:
+      - nginx
+    networks:
+      - gym_frontend
+      - gym_monitoring
+
+  # 7. cAdvisor (Thu thập Metrics Container từ Docker Engine)
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:v0.49.1
+    container_name: gym_cadvisor
+    restart: unless-stopped
+    privileged: true
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+    networks:
+      - gym_monitoring
+
+  # 8. Prometheus Server (Thu thập và lưu trữ Time-Series Metrics)
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: gym_prometheus
+    restart: unless-stopped
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    depends_on:
+      - app
+      - mysqld_exporter
+      - nginx_exporter
+      - cadvisor
+    networks:
+      - gym_monitoring
+
+  # 9. Grafana (Trực quan hóa giám sát hệ thống với Dashboard)
+  grafana:
+    image: grafana/grafana:latest
+    container_name: gym_grafana
+    restart: unless-stopped
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_USERS_ALLOW_SIGN_UP=false
+    ports:
+      - "3001:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./grafana/dashboards:/etc/grafana/dashboards:ro
+    depends_on:
+      - prometheus
+      - loki
+    networks:
+      - gym_monitoring
+
+  # 10. Loki (Lưu trữ và xử lý Log tập trung - Commit 3)
+  loki:
+    image: grafana/loki:latest
+    container_name: gym_loki
+    restart: unless-stopped
+    command: -config.file=/etc/loki/loki.yml
+    ports:
+      - "3100:3100"
+    volumes:
+      - ./loki/loki.yml:/etc/loki/loki.yml:ro
+      - loki_data:/loki
+    networks:
+      - gym_monitoring
+
+  # 11. Promtail (Thu thập Log từ Docker Containers gửi về Loki - Commit 3)
+  promtail:
+    image: grafana/promtail:latest
+    container_name: gym_promtail
+    restart: unless-stopped
+    command: -config.file=/etc/promtail/promtail.yml
+    volumes:
+      - ./promtail/promtail.yml:/etc/promtail/promtail.yml:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+    depends_on:
+      - loki
+    networks:
+      - gym_monitoring
 
 # HARDENING: Cô lập phân tầng mạng (Network Isolation)
 networks:
@@ -92,6 +210,11 @@ networks:
     driver: bridge
   gym_backend:
     driver: bridge
+  gym_monitoring:
+    driver: bridge
 
 volumes:
   mysql_data:
+  prometheus_data:
+  grafana_data:
+  loki_data:

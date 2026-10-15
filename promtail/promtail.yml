@@ -1,0 +1,39 @@
+server:
+  http_listen_port: 9080
+  grpc_listen_port: 0
+
+positions:
+  filename: /tmp/positions.yaml
+
+clients:
+  - url: http://loki:3100/loki/api/v1/push
+
+scrape_configs:
+  # Thu thập log từ tất cả các Docker Container của hệ thống Gym
+  - job_name: gym-docker-containers
+    docker_sd_configs:
+      - host: unix:///var/run/docker.sock
+        refresh_interval: 5s
+        filters:
+          - name: name
+            values:
+              - gym_web_app
+              - gym_mysql_db
+              - gym_nginx_proxy
+              - gym_phpmyadmin
+              - gym_prometheus
+              - gym_grafana
+              - gym_mysqld_exporter
+              - gym_nginx_exporter
+              - gym_cadvisor
+    relabel_configs:
+      # Dùng tên container làm label
+      - source_labels: [__meta_docker_container_name]
+        regex: /(.*)
+        target_label: container
+      # Dùng image làm label
+      - source_labels: [__meta_docker_container_image]
+        target_label: image
+      # Thêm label job là tên container
+      - source_labels: [__meta_docker_container_name]
+        target_label: job
