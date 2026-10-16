@@ -10,6 +10,10 @@ const { register, metricsMiddleware } = require('./config/metrics');
 
 // Khởi tạo app
 const app = express();
+
+// Bảo mật: ẩn thông tin framework Express
+app.disable('x-powered-by');
+
 const PORT = process.env.PORT || 3000;
 
 // Cấu hình View Engine (EJS)
