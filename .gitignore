@@ -29,3 +29,8 @@ nginx/ssl/nginx.key
 # Local environment files
 .env.*
 !.env.example
+
+# Local backups - never commit database dumps or backup configs
+/backups/
+/docker-compose.yml.backup
+/docker-compose.yml.backup2
