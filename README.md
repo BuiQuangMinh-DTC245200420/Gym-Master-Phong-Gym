@@ -65,9 +65,26 @@ Tạo file `.env` từ file mẫu:
 ```bash
 cp .env.example .env
 ```
+
+Tạo chứng chỉ SSL tự ký cho Nginx (bảo mật không commit `nginx.key` lên GitHub):
+```bash
+# Cách 1 (Khuyên dùng): Chạy script tự động có sẵn
+# Trên Windows PowerShell:
+.\nginx\ssl\generate-ssl.ps1
+
+# Trên Linux / macOS / Git Bash:
+chmod +x ./nginx/ssl/generate-ssl.sh && ./nginx/ssl/generate-ssl.sh
+
+# Cách 2: Chạy trực tiếp bằng OpenSSL (nếu máy đã cài OpenSSL):
+openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout nginx/ssl/nginx.key -out nginx/ssl/nginx.crt -subj "/CN=localhost"
+
+# Cách 3: Nếu máy chưa có OpenSSL, dùng Docker alpine/openssl:
+docker run --rm -v "${PWD}/nginx/ssl:/ssl" alpine/openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /ssl/nginx.key -out /ssl/nginx.crt -subj "/CN=localhost"
+```
+
 Tạo file cấu hình MySQL Exporter:
 ```bash
-# Nội dung file database/.my.cnf
+# Tạo file database/.my.cnf (file này được bảo mật trong .gitignore)
 [client]
 user=root
 password=<DB_ROOT_PASSWORD_trong_file_.env>
@@ -152,8 +169,8 @@ count_over_time({container="gym_web_app"} |= "ERROR" [1m])
 ## 📝 8. Lịch sử Commit theo Quy định Đề tài
 - **Commit 1**: Triển khai ứng dụng Gym Web App, MySQL Database, phpMyAdmin và cấu hình Nginx Reverse Proxy (HTTPS + Security Headers).
 - **Commit 2**: Tích hợp hệ thống giám sát Prometheus và Grafana Dashboard giám sát container, web server và database (cAdvisor, mysqld_exporter, nginx_exporter).
-- **Commit 3**: Tích hợp hệ thống log tập trung Loki + Promtail, truy vấn log LogQL và áp dụng các giải pháp Hardening bảo mật (3 mạng Network Isolation, .gitignore bảo mật).
-- **Commit 4**: Bổ sung tài liệu kết quả kiểm thử Loki + Promtail và các truy vấn LogQL.
+- **Commit 3**: Triển khai hệ thống log tập trung Loki + Promtail, truy vấn log LogQL và tài liệu kiểm thử log.
+- **Các Commit tiếp theo**: Áp dụng các giải pháp Hardening bảo mật nâng cao (Network Isolation 3 phân vùng mạng, non-root user node, bảo vệ secret credentials và SSL private key).
 ## 📝 9. Kết quả kiểm thử Loki + Promtail + LogQL
 
 Đã kiểm thử trên môi trường Docker Compose:
