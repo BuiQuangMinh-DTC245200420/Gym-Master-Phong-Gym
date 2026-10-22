@@ -17,10 +17,10 @@ $opensslCmd = Get-Command openssl -ErrorAction SilentlyContinue
 
 if ($opensslCmd) {
     Write-Host "[INFO] Sử dụng OpenSSL trên hệ thống: $($opensslCmd.Source)" -ForegroundColor Green
-    & openssl req -x509 -nodes -days $Days -newkey rsa:2048 -keyout $keyPath -out $certPath -subj "/CN=$Domain"
+    & openssl req -x509 -nodes -days $Days -newkey rsa:2048 -keyout $keyPath -out $certPath -subj "/CN=$Domain" -addext "subjectAltName=DNS:gymmaster.local,DNS:localhost,DNS:gym.local,IP:127.0.0.1"
 } else {
     Write-Host "[INFO] Không tìm thấy OpenSSL trên hệ thống. Đang sử dụng Docker alpine/openssl để tạo..." -ForegroundColor Yellow
-    docker run --rm -v "${scriptDir}:/ssl" alpine/openssl req -x509 -nodes -days $Days -newkey rsa:2048 -keyout /ssl/nginx.key -out /ssl/nginx.crt -subj "/CN=$Domain"
+    docker run --rm -v "${scriptDir}:/ssl" alpine/openssl req -x509 -nodes -days $Days -newkey rsa:2048 -keyout /ssl/nginx.key -out /ssl/nginx.crt -subj "/CN=$Domain" -addext "subjectAltName=DNS:gymmaster.local,DNS:localhost,DNS:gym.local,IP:127.0.0.1"
 }
 
 if ((Test-Path $certPath) -and (Test-Path $keyPath)) {

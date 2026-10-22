@@ -34,3 +34,6 @@ nginx/ssl/nginx.key
 /backups/
 /docker-compose.yml.backup
 /docker-compose.yml.backup2
+
+# IDE files
+.vscode/

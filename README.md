@@ -52,68 +52,73 @@ Hệ thống giải quyết bài toán quản lý phòng tập Gym từ quy trì
 
 ## 🚀 4. Hướng dẫn Khởi chạy Hệ thống
 
-### Yêu cầu cài đặt trước:
-- **Docker Desktop** (bản 20.x trở lên) và **Docker Compose**
-- **Git**
+### ⚡ Cách 1: Khởi chạy Nhanh Nhất (1-Click trên Windows - Khuyên Dùng Khi Báo Cáo / Chấm Thi)
+Chỉ cần mở thư mục dự án và **Click đúp vào file:**
+👉 **`Mo-He-Thong-Gym.bat`**
 
-### Bước 1: Clone dự án và cấu hình biến môi trường
+> **Tự động hóa 100%:** File script sẽ tự động kiểm tra, khởi động toàn bộ 11 container Docker trong nền và tự động mở trình duyệt web vào hệ thống tại: **`https://gymmaster.localtest.me`** (hoặc `https://localhost`).
+
+---
+
+### 💻 Cách 2: Khởi chạy bằng Lệnh Terminal (Dành cho Mọi Hệ Điều Hành)
+
+#### 🔹 Bước 1: Khởi chạy toàn bộ hệ thống
+Mở Terminal / PowerShell tại thư mục dự án và chạy:
 ```bash
-git clone <URL_REPOSITORY_GITHUB_CUA_BAN>
-cd "Phát triển phần mềm-Phòng Gym"
+docker compose up -d
 ```
-Tạo file `.env` từ file mẫu:
-```bash
-cp .env.example .env
-```
+*(Nếu là lần đầu tiên chạy trên máy mới, thêm cờ `--build`: `docker compose up -d --build`)*
 
-Tạo chứng chỉ SSL tự ký cho Nginx (bảo mật không commit `nginx.key` lên GitHub):
-```bash
-# Cách 1 (Khuyên dùng): Chạy script tự động có sẵn
-# Trên Windows PowerShell:
-.\nginx\ssl\generate-ssl.ps1
-
-# Trên Linux / macOS / Git Bash:
-chmod +x ./nginx/ssl/generate-ssl.sh && ./nginx/ssl/generate-ssl.sh
-
-# Cách 2: Chạy trực tiếp bằng OpenSSL (nếu máy đã cài OpenSSL):
-openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout nginx/ssl/nginx.key -out nginx/ssl/nginx.crt -subj "/CN=localhost"
-
-# Cách 3: Nếu máy chưa có OpenSSL, dùng Docker alpine/openssl:
-docker run --rm -v "${PWD}/nginx/ssl:/ssl" alpine/openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /ssl/nginx.key -out /ssl/nginx.crt -subj "/CN=localhost"
-```
-
-Tạo file cấu hình MySQL Exporter:
-```bash
-# Tạo file database/.my.cnf (file này được bảo mật trong .gitignore)
-[client]
-user=root
-password=<DB_ROOT_PASSWORD_trong_file_.env>
-host=db
-port=3306
-```
-
-### Bước 2: Khởi chạy toàn bộ hệ thống bằng Docker Compose
-```bash
-docker compose up -d --build
-```
-
-### Bước 3: Kiểm tra trạng thái các container
+#### 🔹 Bước 2: Kiểm tra trạng thái các dịch vụ
 ```bash
 docker compose ps
 ```
-Đảm bảo tất cả các container đều ở trạng thái `running` (hoặc `healthy`).
+> Đảm bảo toàn bộ **11 container** đều hiển thị trạng thái `Up` (hoặc `Up (healthy)`).
+
+#### 🔹 Bước 3: Mở trình duyệt và trải nghiệm
+Truy cập hệ thống qua một trong hai địa chỉ:
+- Tên miền: **[https://gymmaster.localtest.me](https://gymmaster.localtest.me)**
+- Hoặc IP Local: **[https://localhost](https://localhost)**
+
+---
+
+### ⚙️ Hướng dẫn Chuẩn bị Môi trường (Chỉ cần làm 1 lần khi Clone sang Máy Mới)
+Nếu bạn vừa tải/clone dự án về máy tính mới tinh, hãy thực hiện các bước chuẩn bị sau:
+
+1. **Tạo file cấu hình môi trường `.env`:**
+   ```bash
+   cp .env.example .env
+   ```
+2. **Tạo chứng chỉ SSL cho Nginx (Chạy 1 trong 2 cách):**
+   - *Trên Windows (PowerShell):*
+     ```powershell
+     .\nginx\ssl\generate-ssl.ps1
+     ```
+   - *Trên Linux / macOS / Git Bash:*
+     ```bash
+     chmod +x ./nginx/ssl/generate-ssl.sh && ./nginx/ssl/generate-ssl.sh
+     ```
+3. **Tạo file xác thực MySQL Exporter (`database/.my.cnf`):**
+   ```ini
+   [client]
+   user=root
+   password=26/09/2006
+   host=db
+   port=3306
+   ```
 
 ---
 
 ## 🌐 5. Địa chỉ Truy cập Dịch vụ
 
-| Dịch vụ | Địa chỉ URL | Ghi chú |
-| :--- | :--- | :--- |
-| **Website Phòng Gym (HTTPS)** | **https://localhost** | Chấp nhận cảnh báo SSL tự ký để vào web |
-| **Website Phòng Gym (HTTP)** | **http://localhost** | Tự động chuyển hướng (Redirect 301) về HTTPS |
-| **Quản trị Database phpMyAdmin** | **http://localhost:8080** | Đăng nhập: `root` / `gym_root_secure_2026!` |
-| **Prometheus Targets & Metrics** | **http://localhost:9090** | Xem các target giám sát hệ thống |
-| **Grafana Monitoring Dashboard** | **http://localhost:3001** | Đăng nhập: `admin` / `admin` |
+| Dịch vụ | Địa chỉ URL | Thông tin đăng nhập | Ghi chú |
+| :--- | :--- | :--- | :--- |
+| **Website Phòng Gym (Tên miền)** | **https://gymmaster.localtest.me** | *(Xem danh sách tài khoản mục 6)* | Tên miền tự phân giải loopback |
+| **Website Phòng Gym (Localhost)** | **https://localhost** | *(Xem danh sách tài khoản mục 6)* | Chấp nhận cảnh báo SSL tự ký |
+| **Website Phòng Gym (HTTP)** | **http://localhost** | - | Tự động chuyển hướng (Redirect 301) về HTTPS |
+| **Quản trị Database phpMyAdmin** | **http://localhost:8080** | User: `root`<br>Pass: `26/09/2006` *(hoặc pass trong .env)* | Quản trị dữ liệu CSDL MySQL |
+| **Prometheus Targets & Metrics** | **http://localhost:9090** | - | Kiểm tra trạng thái 5 targets thu thập |
+| **Grafana Dashboard Giám sát** | **http://localhost:3001** | User: `admin`<br>Pass: `26/09/2006` *(hoặc `admin`)* | Trực quan hóa Metrics & LogQL |
 
 ---
 

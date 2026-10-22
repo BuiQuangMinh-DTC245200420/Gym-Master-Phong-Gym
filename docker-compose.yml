@@ -12,6 +12,9 @@ services:
     volumes:
       - mysql_data:/var/lib/mysql
       - ./database/init.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
     # HARDENING: DB chỉ nằm trong mạng nội bộ gym_backend, không mở port trực tiếp ra Internet
     networks:
       - gym_backend
@@ -42,6 +45,9 @@ services:
       DB_USER: ${DB_USER}
       DB_PASSWORD: ${DB_PASSWORD}
       SESSION_SECRET: ${SESSION_SECRET}
+    volumes:
+      - ./app/src:/app/src:ro
+      - ./app/public:/app/public:ro
     depends_on:
       db:
         condition: service_healthy
