@@ -29,6 +29,14 @@ foreach ($domain in $domains) {
     }
 }
 
+# Cài đặt chứng chỉ SSL vào Trusted Root Store để trình duyệt tin cậy
+$certPath = Join-Path $PSScriptRoot "nginx\ssl\nginx.crt"
+if (Test-Path $certPath) {
+    Write-Host "[INFO] Đang cài đặt chứng chỉ SSL vào Windows Trusted Root..." -ForegroundColor Yellow
+    certutil -addstore -f "Root" $certPath | Out-Null
+    Write-Host "[OK] Đã tin cậy chứng chỉ SSL trên Windows!" -ForegroundColor Green
+}
+
 # Làm mới bộ nhớ đệm DNS
 Write-Host "[INFO] Đang làm mới bộ đệm DNS hệ thống..." -ForegroundColor Yellow
 ipconfig /flushdns | Out-Null
