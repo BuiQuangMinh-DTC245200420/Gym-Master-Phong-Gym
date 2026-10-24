@@ -1,5 +1,4 @@
 services:
-  # 1. Cơ sở dữ liệu MySQL
   db:
     image: mysql:8.0
     container_name: gym_mysql_db
@@ -15,7 +14,6 @@ services:
     command:
       - --character-set-server=utf8mb4
       - --collation-server=utf8mb4_unicode_ci
-    # HARDENING: DB chỉ nằm trong mạng nội bộ gym_backend, không mở port trực tiếp ra Internet
     networks:
       - gym_backend
     healthcheck:
@@ -25,7 +23,6 @@ services:
       retries: 5
       start_period: 30s
 
-  # 2. Ứng dụng Web Quản lý Phòng Gym (Node.js Express)
   app:
     build:
       context: ./app
@@ -62,7 +59,6 @@ services:
       retries: 3
       start_period: 10s
 
-  # 3. Giao diện quản trị CSDL phpMyAdmin
   phpmyadmin:
     image: phpmyadmin/phpmyadmin:latest
     container_name: gym_phpmyadmin
@@ -80,7 +76,6 @@ services:
       - gym_frontend
       - gym_backend
 
-  # 4. Nginx Reverse Proxy (HTTPS Tự Ký + Security Headers)
   nginx:
     image: nginx:alpine
     container_name: gym_nginx_proxy
@@ -98,7 +93,6 @@ services:
       - gym_frontend
       - gym_monitoring
 
-  # 5. MySQL Exporter (Thu thập Metrics từ MySQL cho Prometheus)
   mysqld_exporter:
     image: prom/mysqld-exporter:latest
     container_name: gym_mysqld_exporter
@@ -114,7 +108,6 @@ services:
       - gym_backend
       - gym_monitoring
 
-  # 6. Nginx Exporter (Thu thập Metrics từ Nginx stub_status)
   nginx_exporter:
     image: nginx/nginx-prometheus-exporter:latest
     container_name: gym_nginx_exporter
@@ -127,7 +120,6 @@ services:
       - gym_frontend
       - gym_monitoring
 
-  # 7. cAdvisor (Thu thập Metrics Container từ Docker Engine)
   cadvisor:
     image: gcr.io/cadvisor/cadvisor:v0.49.1
     container_name: gym_cadvisor
@@ -140,7 +132,6 @@ services:
     networks:
       - gym_monitoring
 
-  # 8. Prometheus Server (Thu thập và lưu trữ Time-Series Metrics)
   prometheus:
     image: prom/prometheus:latest
     container_name: gym_prometheus
@@ -163,7 +154,6 @@ services:
     networks:
       - gym_monitoring
 
-  # 9. Grafana (Trực quan hóa giám sát hệ thống với Dashboard)
   grafana:
     image: grafana/grafana:latest
     container_name: gym_grafana
@@ -184,7 +174,6 @@ services:
     networks:
       - gym_monitoring
 
-  # 10. Loki (Lưu trữ và xử lý Log tập trung - Commit 3)
   loki:
     image: grafana/loki:latest
     container_name: gym_loki
@@ -198,7 +187,6 @@ services:
     networks:
       - gym_monitoring
 
-  # 11. Promtail (Thu thập Log từ Docker Containers gửi về Loki - Commit 3)
   promtail:
     image: grafana/promtail:latest
     container_name: gym_promtail
@@ -213,7 +201,6 @@ services:
     networks:
       - gym_monitoring
 
-# HARDENING: Cô lập phân tầng mạng (Network Isolation)
 networks:
   gym_frontend:
     driver: bridge
