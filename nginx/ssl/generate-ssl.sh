@@ -1,5 +1,4 @@
 #!/bin/sh
-# Script sinh chứng chỉ SSL tự ký cho Nginx (Linux / macOS / Git Bash)
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 DOMAIN="localhost"
 DAYS=365

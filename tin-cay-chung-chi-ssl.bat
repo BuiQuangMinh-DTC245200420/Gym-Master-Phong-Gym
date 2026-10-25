@@ -8,7 +8,6 @@ echo ==========================================================
 echo.
 echo Đang yêu cầu quyền Administrator để cài chứng chỉ...
 
-:: Kiểm tra quyền Admin
 net session >nul 2>&1
 if %errorlevel% neq 0 (
     echo [INFO] Đang chuyển sang quyền Quản trị viên (Admin)...

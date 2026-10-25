@@ -1,4 +1,3 @@
-# Script sinh chứng chỉ SSL tự ký cho môi trường thử nghiệm Nginx HTTPS
 param(
     [string]$Domain = "localhost",
     [int]$Days = 365
@@ -12,7 +11,6 @@ Write-Host "==========================================" -ForegroundColor Cyan
 Write-Host "Sinh chứng chỉ SSL tự ký cho Nginx ($Domain)" -ForegroundColor Cyan
 Write-Host "==========================================" -ForegroundColor Cyan
 
-# Kiểm tra openssl trên máy
 $opensslCmd = Get-Command openssl -ErrorAction SilentlyContinue
 
 if ($opensslCmd) {
